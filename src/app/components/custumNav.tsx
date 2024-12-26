@@ -281,7 +281,8 @@ export default function CustomNav() {
     return (
         <div>
             <Card>
-                <h1 className='text-5xl font-bold text-center relative top-[80px]'>加密货币市场信息</h1>
+                <h1 className='text-5xl font-bold text-center relative top-[70px]'>加密货币市场信息</h1>
+                <h3 className='text-2xl text-center text-gray-500 relative top-[120px]'>快速寻找最有价值的投资标的</h3>
                 <canvas ref={canvasRef} id="nav_canvas" className='w-full h-[400px]'></canvas>
             </Card>
         </div>

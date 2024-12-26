@@ -5,7 +5,19 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary-100: #86efac;
+  --primary-200: #f0fdf5;
+  --primary-300: #19725D;
+  --accent-100: #f5be0b;
+  --accent-200: #fef1c7;
+  --text-100: #292524;
+  --text-200: #78716c;
+  --bg-100: #fafaf9;
+  --bg-200: #f5f5f4;
+  --bg-300: #E0E2E5;
 }
+
+
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -19,4 +31,18 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
   background-image: url('/images/home/bg.jpg');
+}
+
+.table-container {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.ticker-row {
+  transition: background-color 0.2s ease;
+}
+
+.ticker-value {
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
