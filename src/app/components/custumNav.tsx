@@ -16,7 +16,7 @@ class Peep {
     scaleX: number = 1;
     walk: gsap.core.Timeline | null = null;
     bubbleMessage: string | null = null;
-    drawArgs: any[];
+    drawArgs: [HTMLImageElement, ...number[]];
 
     constructor({ image, rect }: { image: HTMLImageElement; rect: number[] }) {
         this.image = image;
@@ -74,6 +74,7 @@ class Peep {
         ctx.fillText(text, x + width / 2, y + bubbleHeight / 2);
     }
 }
+
 
 export default function CustomNav() {
     const canvasRef = useRef<HTMLCanvasElement>(null);

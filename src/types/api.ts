@@ -1,20 +1,21 @@
 export interface RequestConfig {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
     path: string;
-    body?: any;
+    body?: string;
     timestamp?: string;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
     code: string;
     msg: string;
-    data: T;
+    data: T[];
 }
 
-// 可以继续添加其他接口定义
-export interface Balance {
-    ccy: string;
-    bal: string;
-    frozenBal: string;
-    availBal: string;
+export interface Ticker {
+    instId: string;
+    last: string;
+    vol24h: string;
+    volCcy24h: string;
+    open24h: string;
+    chg24h?: string;
 } 

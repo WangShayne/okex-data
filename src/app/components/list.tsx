@@ -2,37 +2,19 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Card from "./card";
-import Image from 'next/image';
-import { getAllTickers } from '@/api/tickers';
 import TickerRow from './TickerRow';
+import { getAllTickers } from '@/api/tickers';
+import type { Ticker } from '@/types/api';
 
-interface Ticker {
-    instId: string;
-    last: string;
-    vol24h: string;
-    volCcy24h: string;
-    open24h: string;
-    chg24h?: string;
-}
-
-interface Instrument {
-    instId: string;
-    quoteCcy: string;
-    state: string;
-}
-
-// 将 getCoinIcon 移到组件外部
 const getCoinIcon = (symbol: string) => {
     try {
-        // 从交易对中提取币种名称（例如 BTC-USDT -> btc）
         const coinSymbol = symbol.split('-')[0].toLowerCase();
         return `https://www.okx.com/cdn/oksupport/asset/currency/icon/${coinSymbol}.png`;
-    } catch (e) {
+    } catch {
         return '/default-coin.svg';
     }
 };
 
-// 计算涨跌幅的函数移到组件外部
 const calculateChangePercent = (last: string, open24h: string) => {
     try {
         const lastPrice = parseFloat(last);
@@ -52,13 +34,11 @@ export default function List() {
     const [tickers, setTickers] = useState<Ticker[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // 使用防抖处理WebSocket更新
     const handleTickerUpdate = useCallback((ticker: Ticker) => {
         setTickers(prevTickers => {
             const index = prevTickers.findIndex(t => t.instId === ticker.instId);
             if (index === -1) return prevTickers;
 
-            // 检查数据是否真的变化
             const oldTicker = prevTickers[index];
             if (oldTicker.last === ticker.last &&
                 oldTicker.open24h === ticker.open24h &&
@@ -72,38 +52,30 @@ export default function List() {
         });
     }, []);
 
-    // 使用 useMemo 优化排序后的数据
     const sortedData = useMemo(() => {
         return [...tickers].sort((a, b) => {
             let compareResult = 0;
 
-            // 根据不同字段进行排序
             if (sortField === 'chg24h') {
                 const changeA = parseFloat(calculateChangePercent(a.last, a.open24h));
                 const changeB = parseFloat(calculateChangePercent(b.last, b.open24h));
                 compareResult = changeB - changeA;
             } else if (sortField === 'instId') {
-                // 字符串比较
                 compareResult = a.instId.localeCompare(b.instId);
             } else {
-                // 数字比较
                 compareResult = Number(b[sortField]) - Number(a[sortField]);
             }
 
-            // 根据排序方向返回结果
             return sortDirection === 'desc' ? compareResult : -compareResult;
         });
     }, [tickers, sortField, sortDirection]);
 
-    // 使用 useCallback 优化排序处理函数
     const handleSort = useCallback((field: keyof Ticker) => {
         setSortField(field);
         setSortDirection(prev => {
-            // 如果是同一个字段，切换排序方向
             if (sortField === field) {
                 return prev === 'desc' ? 'asc' : 'desc';
             }
-            // 如果是新字段，默认降序
             return 'desc';
         });
     }, [sortField]);
@@ -115,17 +87,14 @@ export default function List() {
         const initialize = async () => {
             try {
                 const tickersResponse = await getAllTickers('SPOT');
-                if (tickersResponse.data) {
-                    const usdtTickers = tickersResponse.data
-                        .filter((ticker: Ticker) =>
-                            ticker.instId.includes('USDT') &&
-                            !ticker.instId.includes('TRY')
-                        )
-                        .sort((a: Ticker, b: Ticker) => Number(b.volCcy24h) - Number(a.volCcy24h))
+                if (tickersResponse.data && Array.isArray(tickersResponse.data)) {
+                    const usdtTickers = (tickersResponse.data as Ticker[])
+                        .filter(ticker => ticker.instId.includes('USDT') && !ticker.instId.includes('TRY'))
+                        .sort((a, b) => Number(b.volCcy24h) - Number(a.volCcy24h))
                         .slice(0, 50);
 
                     setTickers(usdtTickers);
-                    setupWebSocket(usdtTickers.map((ticker: Ticker) => ticker.instId));
+                    setupWebSocket(usdtTickers.map(ticker => ticker.instId));
                 }
             } catch (error) {
                 console.error('初始化失败:', error);

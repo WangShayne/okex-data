@@ -1,13 +1,12 @@
-import { createSign } from '@/utils';
-import type { RequestConfig, ApiResponse } from '@/types/api';
+import type { ApiResponse } from '@/types/api';
 
 const baseUrl = 'https://www.okx.com/api/v5';
 
-export async function getAllTickers(type:string) {
+export async function getAllTickers(type: string): Promise<ApiResponse> {
     const params = new URLSearchParams({
-        instType: type || 'SPOT'
+        instType: type
     });
-    // 添加错误处理
+
     try {
         const response = await fetch(`${baseUrl}/market/tickers?${params}`);
         const data = await response.json();

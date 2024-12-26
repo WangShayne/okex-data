@@ -1,12 +1,14 @@
 import { memo } from 'react';
 import Image from 'next/image';
-import type { Ticker } from './types';
+import type { Ticker } from '@/types/api';
 
-const TickerRow = memo(({ item, calculateChangePercent, getCoinIcon }: {
+interface TickerRowProps {
     item: Ticker;
     calculateChangePercent: (last: string, open24h: string) => string;
     getCoinIcon: (symbol: string) => string;
-}) => {
+}
+
+const TickerRow = memo(function TickerRow({ item, calculateChangePercent, getCoinIcon }: TickerRowProps) {
     const changePercent = calculateChangePercent(item.last, item.open24h);
 
     return (
@@ -19,8 +21,8 @@ const TickerRow = memo(({ item, calculateChangePercent, getCoinIcon }: {
                         width={24}
                         height={24}
                         className="rounded-full"
-                        onError={(e: any) => {
-                            e.target.src = '/default-coin.svg';
+                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                            e.currentTarget.src = '/default-coin.svg';
                         }}
                     />
                 </div>
@@ -33,11 +35,7 @@ const TickerRow = memo(({ item, calculateChangePercent, getCoinIcon }: {
             <td className="p-4">{Number(item.volCcy24h).toLocaleString()}</td>
         </tr>
     );
-}, (prevProps, nextProps) => {
-    // 只有当关键数据变化时才重新渲染
-    return prevProps.item.last === nextProps.item.last &&
-        prevProps.item.open24h === nextProps.item.open24h &&
-        prevProps.item.volCcy24h === nextProps.item.volCcy24h;
 });
 
+TickerRow.displayName = 'TickerRow';
 export default TickerRow; 
